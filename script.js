@@ -1,44 +1,179 @@
 document.addEventListener(
   "DOMContentLoaded",
   function () {
-    // Tu código JavaScript que manipula el DOM aquí
+    const numeroDeDias = {
+      1: 31,
+      2: 28,
+      3: 31,
+      4: 30,
+      5: 31,
+      6: 30,
+      7: 31,
+      8: 31,
+      9: 30,
+      10: 31,
+      11: 30,
+      12: 31,
+    };
+
+    const nombresMeses = [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
+    ];
+
+    const diasSemana = [
+      "Domingo",
+      "Lunes",
+      "Martes",
+      "Miercoles",
+      "Jueves",
+      "Viernes",
+      "Sabado",
+    ];
+
+    let diasExtra = 0;
+
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
+
+    // const header = document.getElementById("calendar-header");
+    const title = document.getElementById("calendar-title");
+    const dayHeader = document.getElementById("day-header");
+    const body = document.getElementById("day-body");
+
+    const inputMes = document.getElementById("inputMes");
+    const inputAnio = document.getElementById("inputAnio");
+    const inputDia = document.getElementById("inputDia");
+    const inputImagen = document.getElementById("inputImagen");
+    const inputTitle = document.getElementById("inputTitle");
+
+    inputMes.value = hoy.getMonth() + 1;
+    inputAnio.value = hoy.getFullYear();
+    inputDia.value = hoy.getDate();
+
+    inputMes.addEventListener("input", mostrarNombreMes);
+    inputDia.addEventListener("input", mostrarDias);
+
+    document.addEventListener("wheel", function (event) {
+      const activeElement = document.activeElement;
+
+      if (
+        activeElement === inputMes ||
+        activeElement === inputAnio ||
+        activeElement === inputDia
+      ) {
+        const increment = event.deltaY > 0 ? 1 : -1;
+        activeElement.value = parseInt(activeElement.value) + increment;
+
+        if (activeElement === inputMes) {
+          ajustarRango(inputMes, 1, 12);
+          mostrarNombreMes();
+        } else if (activeElement === inputAnio) {
+          ajustarRango(inputAnio, 1999, 2099);
+        } else if (activeElement === inputDia) {
+          ajustarRango(inputDia, 1, numeroDeDias[inputMes.value]);
+        }
+      }
+    });
+
+    const botonActualizar = document.getElementById("botonActualizar");
+    botonActualizar.addEventListener("click", actualizarCalendario);
+
+    const botonInsertar = document.getElementById("botonInsertar");
+    botonInsertar.addEventListener("click", mostrarImagenes);
+
+    const botonInsertarTitulo = document.getElementById("botonInsertarTitulo");
+    botonInsertarTitulo.addEventListener("click", insertarTitulo);
+
+    function ajustarRango(input, min, max) {
+      const valor = parseInt(input.value);
+      if (valor > max) input.value = min;
+      else if (valor < min) input.value = max;
+    }
+
+    function mostrarImagenes() {
+      const selectedFile = inputImagen.files[0];
+      const selectedDay = parseInt(document.getElementById("inputDia").value);
+
+      if (selectedFile && selectedDay) {
+        const imageElement = document.createElement("img");
+        imageElement.src = URL.createObjectURL(selectedFile);
+        imageElement.alt = `Dia ${selectedDay}`;
+        imageElement.classList.add("day-image");
+
+        const correctDay = selectedDay + diasExtra;
+
+        const dayCell = document.querySelector(
+          `.day-body .day:nth-child(${correctDay})`
+        );
+
+        if (dayCell) {
+          dayCell.innerHTML = `<span>${selectedDay}</span>`;
+          dayCell.appendChild(imageElement);
+        }
+      }
+    }
+
+    function insertarTitulo() {
+      const selectedDay = parseInt(document.getElementById("inputDia").value);
+
+      if (selectedDay) {
+        const correctDay = selectedDay + diasExtra;
+        const dayCell = document.querySelector(
+          `.day-body .day:nth-child(${correctDay})`
+        );
+        // const textElement = document.createElement("label");
+        // textElement.value = inputTitle.value;
+        if (dayCell) {
+          // Verificar si ya hay un título en la celda
+          const existingTitle = dayCell.querySelector(".day-title");
+
+          if (existingTitle) {
+            // Si ya hay un título, reemplazarlo
+            existingTitle.textContent = inputTitle.value;
+          } else {
+            // Si no hay un título, agregar uno nuevo
+            const titleElement = document.createElement("div");
+            titleElement.classList.add("day-title");
+            titleElement.textContent = inputTitle.value;
+
+            dayCell.appendChild(titleElement);
+          }
+        }
+      }
+    }
+
     function generarCalendario(mes, anio) {
-      // Encabezado del calendario
-      const header = document.getElementById("calendar-header");
-      header.textContent = `Hero's Calendar ${anio}`;
-
-      // Días de la semana
-      const diasSemana = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
-
-      // Encabezado de los dias
-      const dayHeader = document.getElementById("day-header");
+      title.textContent = `${nombresMeses[mes - 1]}`;
       dayHeader.innerHTML = "";
 
-      // Cuerpo del calendario
-      const body = document.getElementById("day-body");
-      body.innerHTML = "";
-
-      // Agregar los días de la semana al encabezado
       for (const diaSemana of diasSemana) {
         const diaHeader = document.createElement("div");
         diaHeader.textContent = diaSemana;
-        // // diaHeader.classList.add("day");
         dayHeader.appendChild(diaHeader);
       }
 
-      // Obtener el primer día del mes y la cantidad de días en el mes
+      body.innerHTML = "";
       const primerDia = new Date(anio, mes - 1, 1);
       const ultimoDia = new Date(anio, mes, 0);
-
-      // Calcular el número de días en la última semana del mes anterior
       const diasMesAnterior = primerDia.getDay();
+      const diasMesSiguiente = ultimoDia.getDay();
+      diasExtra = diasMesAnterior;
 
       // Generar días del mes anterior en la primera semana del calendario
       for (let i = diasMesAnterior - 1; i >= 0; i--) {
         const diaAnterior = new Date(anio, mes - 1, 0 - i);
-        agregarDia(diaAnterior.getDate(), ["weekend"], body);
+        agregarDia(diaAnterior.getDate(), ["noMesActual"], body);
       }
 
       // Generar días del mes actual
@@ -51,7 +186,14 @@ document.addEventListener(
         } else if (diaActual.getDay() === 0 || diaActual.getDay() === 6) {
           claseDia.push("weekend");
         }
+
         agregarDia(i, claseDia, body);
+      }
+
+      // Generar días del mes anterior en la primera semana del calendario
+      for (let i = diasMesSiguiente + 1; i <= 6; i++) {
+        const diaAnterior = new Date(anio, mes + 1, i);
+        agregarDia(diaAnterior.getDate(), ["noMesActual"], body);
       }
     }
 
@@ -63,81 +205,29 @@ document.addEventListener(
       nuevoDia.appendChild(numeroDia);
       contenedor.appendChild(nuevoDia);
     }
+
     function actualizarCalendario() {
-      const mes = document.getElementById("inputMes").value;
-      const anio = document.getElementById("inputAnio").value;
-      generarCalendario(parseInt(mes), parseInt(anio));
+      const mes = parseInt(inputMes.value);
+      const anio = parseInt(inputAnio.value);
+      generarCalendario(mes, anio);
     }
 
     function mostrarNombreMes() {
-      const inputMes = document.getElementById("inputMes");
+      ajustarRango(inputMes, 1, 12);
       const nombreMes = document.getElementById("nombreMes");
-
-      const mesSeleccionado = parseInt(inputMes.value);
-      if (mesSeleccionado < 1) {
-        inputMes.value = 12;
-      } else if (mesSeleccionado > 12) {
-        inputMes.value = 1;
-      }
-
       nombreMes.textContent = obtenerNombreMes(parseInt(inputMes.value));
     }
 
-    function obtenerNombreMes(numeroMes) {
-      const nombresMeses = [
-        "Enero",
-        "Febrero",
-        "Marzo",
-        "Abril",
-        "Mayo",
-        "Junio",
-        "Julio",
-        "Agosto",
-        "Septiembre",
-        "Octubre",
-        "Noviembre",
-        "Diciembre",
-      ];
+    function mostrarDias() {
+      ajustarRango(inputDia, 1, numeroDeDias[inputMes.value]);
+    }
 
+    function obtenerNombreMes(numeroMes) {
       return nombresMeses[numeroMes - 1];
     }
 
-    const botonActualizar = document.getElementById("botonActualizar");
-    botonActualizar.addEventListener("click", actualizarCalendario);
-
-    const inputMes = document.getElementById("inputMes");
-    inputMes.addEventListener("input", mostrarNombreMes);
-    inputMes.value = hoy.getMonth() + 1;
-
-    const inputAnio = document.getElementById("inputAnio");
-    inputAnio.value = hoy.getFullYear();
-
-    document.addEventListener("wheel", function (event) {
-      const activeElement = document.activeElement;
-
-      if (activeElement === inputMes || activeElement === inputAnio) {
-        activeElement.value =
-          parseInt(activeElement.value) + (event.deltaY > 0 ? 1 : -1);
-
-        if (activeElement === inputMes) {
-          if (activeElement.value < 1) {
-            activeElement.value = 12;
-          } else if (activeElement.value > 12) {
-            activeElement.value = 1;
-          }
-        } else if (activeElement === inputAnio) {
-          if (activeElement.value < 1900) {
-            activeElement.value = 1900;
-          }
-        }
-
-        if (activeElement === inputMes) {
-          mostrarNombreMes();
-        }
-      }
-    });
-
     mostrarNombreMes();
+
     // Inicializar con un mes específico
     generarCalendario(hoy.getMonth() + 1, hoy.getFullYear());
   },
