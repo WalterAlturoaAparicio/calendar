@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calendario Dinámico</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <script src="./script.js"></script>
+    <div class="form-container">
+      <div>
+        <label for="inputMes">Mes:</label>
+        <input type="number" id="inputMes" min="0" max="13" />
+        <span id="nombreMes"></span>
+      </div>
+      <div>
+        <label for="inputAnio">Año:</label>
+        <input type="number" id="inputAnio" min="1900" value="2024" />
+      </div>
+      <button id="botonActualizar">Actualizar Calendario</button>
+      <div>
+        <label for="inputImagen">Seleccionar Imagen:</label>
+        <input type="file" id="inputImagen" accept="image/*" />
+      </div>
+    </div>
+    <div class="calendar">
+      <div class="calendar-header" id="calendar-header">
+        <!-- El mes y el año se actualizarán dinámicamente -->
+      </div>
+      <div class="calendar-body" id="calendar-body">
+        <div class="day-header" id="day-header">
+          <!-- ... Los días de la semana se generarán dinámicamente aquí ... -->
+        </div>
+        <div class="day-body" id="day-body">
+          <!-- Los días del mes se actualizarán dinámicamente -->
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
