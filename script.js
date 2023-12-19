@@ -90,10 +90,10 @@ document.addEventListener(
     botonActualizar.addEventListener("click", actualizarCalendario);
 
     const botonInsertar = document.getElementById("botonInsertar");
-    botonInsertar.addEventListener("click", mostrarImagenes);
+    botonInsertar.addEventListener("click", insertar);
 
-    const botonInsertarTitulo = document.getElementById("botonInsertarTitulo");
-    botonInsertarTitulo.addEventListener("click", insertarTitulo);
+    const botonLimpiarImagen = document.getElementById("botonLimpiarImagen");
+    botonLimpiarImagen.addEventListener("click", limpiarImagen);
 
     function ajustarRango(input, min, max) {
       const valor = parseInt(input.value);
@@ -101,16 +101,11 @@ document.addEventListener(
       else if (valor < min) input.value = max;
     }
 
-    function mostrarImagenes() {
+    function insertar() {
       const selectedFile = inputImagen.files[0];
       const selectedDay = parseInt(document.getElementById("inputDia").value);
 
-      if (selectedFile && selectedDay) {
-        const imageElement = document.createElement("img");
-        imageElement.src = URL.createObjectURL(selectedFile);
-        imageElement.alt = `Dia ${selectedDay}`;
-        imageElement.classList.add("day-image");
-
+      if (selectedDay) {
         const correctDay = selectedDay + diasExtra;
 
         const dayCell = document.querySelector(
@@ -119,23 +114,6 @@ document.addEventListener(
 
         if (dayCell) {
           dayCell.innerHTML = `<span>${selectedDay}</span>`;
-          dayCell.appendChild(imageElement);
-        }
-      }
-    }
-
-    function insertarTitulo() {
-      const selectedDay = parseInt(document.getElementById("inputDia").value);
-
-      if (selectedDay) {
-        const correctDay = selectedDay + diasExtra;
-        const dayCell = document.querySelector(
-          `.day-body .day:nth-child(${correctDay})`
-        );
-        // const textElement = document.createElement("label");
-        // textElement.value = inputTitle.value;
-        if (dayCell) {
-          // Verificar si ya hay un título en la celda
           const existingTitle = dayCell.querySelector(".day-title");
 
           if (existingTitle) {
@@ -148,6 +126,13 @@ document.addEventListener(
             titleElement.textContent = inputTitle.value;
 
             dayCell.appendChild(titleElement);
+          }
+          if (selectedFile) {
+            const imageElement = document.createElement("img");
+            imageElement.src = URL.createObjectURL(selectedFile);
+            imageElement.alt = `Dia ${selectedDay}`;
+            imageElement.classList.add("day-image");
+            dayCell.appendChild(imageElement);
           }
         }
       }
@@ -224,6 +209,10 @@ document.addEventListener(
 
     function obtenerNombreMes(numeroMes) {
       return nombresMeses[numeroMes - 1];
+    }
+
+    function limpiarImagen() {
+      inputImagen.value = "";
     }
 
     mostrarNombreMes();
